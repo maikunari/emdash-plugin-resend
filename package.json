@@ -8,8 +8,16 @@
     ".": "./dist/index.js",
     "./sandbox": "./dist/sandbox-entry.js"
   },
-  "files": ["dist"],
-  "keywords": ["emdash", "cms", "plugin", "email", "resend"],
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "emdash",
+    "cms",
+    "plugin",
+    "email",
+    "resend"
+  ],
   "author": "Mike",
   "license": "MIT",
   "peerDependencies": {
@@ -17,6 +25,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
+    "tsdown": "^0.21.7",
     "typescript": "^5.5.0"
   },
   "scripts": {

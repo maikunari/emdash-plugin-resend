@@ -10,7 +10,9 @@ export function emdashResend(): PluginDescriptor {
     allowedHosts: ["api.resend.com"],
     entrypoint: "emdash-plugin-resend/sandbox",
     format: "standard",
-    adminPages: [{ path: "/settings", label: "Resend", icon: "email" }],
+    hooks: {},
+    routes: {},
+    admin: { pages: [{ path: "/settings", label: "Resend", icon: "email" }] },
   };
 }
 
