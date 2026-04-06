@@ -1,0 +1,26 @@
+{
+  "name": "emdash-plugin-resend",
+  "version": "0.1.0",
+  "description": "Official Resend email provider plugin for EmDash CMS",
+  "type": "module",
+  "main": "dist/index.js",
+  "exports": {
+    ".": "./dist/index.js",
+    "./sandbox": "./dist/sandbox-entry.js"
+  },
+  "files": ["dist"],
+  "keywords": ["emdash", "cms", "plugin", "email", "resend"],
+  "author": "Mike",
+  "license": "MIT",
+  "peerDependencies": {
+    "emdash": "^0.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.5.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  }
+}
