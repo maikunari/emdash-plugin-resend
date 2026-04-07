@@ -30,6 +30,23 @@ async function buildSettingsPage(ctx: PluginContext) {
           },
         ],
       },
+      {
+        type: "section",
+        text: "Send a quick test email directly through the Resend API to verify your credentials.",
+      },
+      {
+        type: "form",
+        submit: { label: "Send Test Email", action_id: "test_email" },
+        fields: [
+          {
+            type: "text_input",
+            action_id: "testEmailAddress",
+            label: "Test Email Recipient",
+            placeholder: "you@example.com",
+            initial_value: "",
+          },
+        ],
+      },
     ],
   };
 }
@@ -122,6 +139,53 @@ export default definePlugin({
         
         if (interaction.type === "form_submit" && interaction.action_id === "save_settings") {
           return saveSettings(ctx, interaction.values ?? {});
+        }
+
+        if (interaction.type === "form_submit" && interaction.action_id === "test_email") {
+          try {
+            const apiKey = await ctx.kv.get<string>("settings:apiKey");
+            const fromAddress = await ctx.kv.get<string>("settings:fromAddress");
+            const testEmailAddress = interaction.values?.testEmailAddress as string;
+
+            if (!apiKey || !fromAddress || !testEmailAddress) {
+              return {
+                ...(await buildSettingsPage(ctx)),
+                toast: { message: "Missing API Key, From Address, or Test Email", type: "error" },
+              };
+            }
+
+            const response = await ctx.http?.fetch("https://api.resend.com/emails", {
+              method: "POST",
+              headers: {
+                "Authorization": `Bearer ${apiKey}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                from: fromAddress,
+                to: testEmailAddress,
+                subject: "Emdash Plugin Test Email",
+                text: "Hello from your EmDash Resend plugin! If you see this, your API credentials are correct.",
+              }),
+            });
+
+            if (!response?.ok) {
+              const err = await response?.text();
+              return {
+                ...(await buildSettingsPage(ctx)),
+                toast: { message: `API Error: ${err}`, type: "error" },
+              };
+            }
+
+            return {
+              ...(await buildSettingsPage(ctx)),
+              toast: { message: "Test email sent successfully!", type: "success" },
+            };
+          } catch (e: any) {
+            return {
+              ...(await buildSettingsPage(ctx)),
+              toast: { message: `Error: ${e.message}`, type: "error" },
+            };
+          }
         }
         
         return { blocks: [] };
