@@ -82,44 +82,47 @@ async function saveSettings(ctx: PluginContext, values: Record<string, unknown>)
 
 export default definePlugin({
   hooks: {
-    "email:deliver": async (event: any, ctx: PluginContext) => {
-      if (!ctx.http) {
-        throw new Error("Missing network:fetch capability");
-      }
+    "email:deliver": {
+      exclusive: true,
+      handler: async (event: any, ctx: PluginContext) => {
+        if (!ctx.http) {
+          throw new Error("Missing network:fetch capability");
+        }
 
-      const apiKey = await ctx.kv.get<string>("settings:apiKey");
-      const fromAddress = await ctx.kv.get<string>("settings:fromAddress");
-      
-      if (!apiKey || !fromAddress) {
-        ctx.log.error("Cannot send email: Resend API key or From Address is missing");
-        throw new Error("Resend credentials missing. Configure them in plugin settings.");
-      }
+        const apiKey = await ctx.kv.get<string>("settings:apiKey");
+        const fromAddress = await ctx.kv.get<string>("settings:fromAddress");
+        
+        if (!apiKey || !fromAddress) {
+          ctx.log.error("Cannot send email: Resend API key or From Address is missing");
+          throw new Error("Resend credentials missing. Configure them in plugin settings.");
+        }
 
-      const { message } = event;
-      
-      const payload = {
-        from: fromAddress,
-        to: message.to,
-        subject: message.subject,
-        text: message.text,
-        html: message.html,
-      };
-      
-      const response = await ctx.http.fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Resend API returned ${response.status}: ${errorText}`);
-      }
-      
-      ctx.log.info("Email delivered via Resend", { to: message.to });
+        const { message } = event;
+        
+        const payload = {
+          from: fromAddress,
+          to: message.to,
+          subject: message.subject,
+          text: message.text,
+          html: message.html,
+        };
+        
+        const response = await ctx.http.fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${apiKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Resend API returned ${response.status}: ${errorText}`);
+        }
+        
+        ctx.log.info("Email delivered via Resend", { to: message.to });
+      },
     },
   },
   
