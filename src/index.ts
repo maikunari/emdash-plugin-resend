@@ -4,7 +4,7 @@ export function emdashResend(): PluginDescriptor {
   return {
     id: "emdash-resend",
     version: "0.1.0",
-    displayName: "Resend",
+    name: "Resend",
     description: "Official email provider for EmDash using Resend.",
     capabilities: ["email:provide", "network:fetch"],
     allowedHosts: ["api.resend.com"],
