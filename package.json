@@ -1,6 +1,6 @@
 {
   "name": "emdash-plugin-resend",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Official Resend email provider plugin for EmDash CMS",
   "type": "module",
   "main": "dist/index.js",
